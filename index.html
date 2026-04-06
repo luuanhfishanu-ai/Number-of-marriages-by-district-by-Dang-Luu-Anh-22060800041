@@ -1,52 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet GeoJSON Map</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-    <style>
-        #map {
-            height: 100vh;
-        }
-    </style>
+<meta charset="utf-8" />
+<title>Hanoi Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>#map { height: 100vh; }</style>
 </head>
 <body>
 
+<h3 style="text-align:center;">
+Number of marriages by district in Hanoi <br>
+Dang Luu Anh
+</h3>
+
 <div id="map"></div>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-    // Tạo map
-    var map = L.map('map').setView([21.0285, 105.8542], 12); // Hà Nội
+var map = L.map('map').setView([21.03, 105.85], 10);
 
-    // Base map
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+fetch('data.geojson')
+.then(r => r.json())
+.then(data => {
+    L.geoJSON(data, {
+        onEachFeature: function(f, l) {
+            l.bindPopup(f.properties.name + ": " + f.properties.value);
+        }
     }).addTo(map);
-
-    // Load GeoJSON
-    fetch('data.geojson')
-        .then(response => response.json())
-        .then(data => {
-            var geojsonLayer = L.geoJSON(data, {
-                style: function(feature) {
-                    return { color: "red" };
-                },
-                onEachFeature: function(feature, layer) {
-                    if (feature.properties) {
-                        layer.bindPopup(JSON.stringify(feature.properties));
-                    }
-                }
-            }).addTo(map);
-
-            map.fitBounds(geojsonLayer.getBounds());
-        });
+});
 </script>
 
 </body>
